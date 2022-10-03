@@ -20,6 +20,14 @@ discussion for your next interview.
 * Preferred & already in place programming language is python although you can use different languages if you can argument it
 * Your solution has be containerized in [OCI complaint containers](https://opencontainers.org/) so we can run it to evaluate.
 
+### Abstract solution design
+
+
+
+```mermaid
+  flowchart TD
+    CSV  --> id1[(TS Database)] --> id2[async API] --> id3[application]
+```
 
 ### Step 1
 
