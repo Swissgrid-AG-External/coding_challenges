@@ -26,7 +26,7 @@ discussion for your next interview.
 
 ```mermaid
   flowchart TD
-    CSV  --> id1[(TS Database)] --> id2[async API] --> id3[application]
+    CSV -- Ingest Logic ---id1[(TS Database)] <--> id2[async API] <--> id3[application]
 ```
 
 ### Step 1
