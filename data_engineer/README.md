@@ -4,7 +4,7 @@
 
 Swissgrid is building a dedicated time series database and therefore wants you to do a scalabe Minimal Viable Product. 
 You get provided a sample dataset of the "to be frequency of the grid" for 2 months in 30sec resolution. Design the solution so it is scalable to hundreds of such timeseries from 15 min resolution to secondly resolutions.
-The goal of the challenges is to ingest the sample data set effeciently into this database and put a asyncronious API framework of your choice on top to query the data to provide data for different applications.
+The goal of the challenges is to ingest the sample data set effeciently into this database and put a asynchronous API framework of your choice on top to query the data to provide data for different applications.
 
 
 **Please invest no more than 6 to 8 hours.**
