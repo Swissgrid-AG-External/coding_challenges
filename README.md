@@ -2,7 +2,7 @@
 
 Our usual Interview flow for technical profiles looks like this, take timeframes with a grain of salt:
 
-'''mermaid
+```mermaid
 gantt
     title Swissgrid Example Recruitment Process
     dateFormat  YYYY-MM-DD
@@ -17,6 +17,6 @@ gantt
     section Decision
         Decision making                     : 7d
         Agreement/Disagreement              :milestone, 0d
-'''
+```
 
 If there are any questions please open up a Github Issue.
