@@ -18,11 +18,9 @@ discussion for your next interview.
 
 * sample timeseries in this repository in CSV format.
 * Preferred & already in place programming language is python although you can use different languages if you can argument it
-* Your solution has be containerized in [OCI complaint containers](https://opencontainers.org/) so we can run it to evaluate.
+* Your solution has be packaged so we can run it(this is part of the challenge), so either use containers or language specific builds
 
 ### Abstract solution design
-
-
 
 ```mermaid
   flowchart TD
@@ -37,7 +35,7 @@ discussion for your next interview.
 
 * Start and configure database 
 * Ingest data to database
-* Write API component query data
+* Write API component to query data
 * Test both components 
 
 ## Evaluation criteria
