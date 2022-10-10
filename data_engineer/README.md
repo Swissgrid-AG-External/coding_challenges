@@ -3,7 +3,7 @@
 ## Intro
 
 Swissgrid is building a dedicated time series database and therefore wants you to do a scalabe Minimal Viable Product. 
-You get provided a sample dataset of the "to be frequency of the grid" for 2 months in 15 min resolution. Design the solution so it is scalable to hundreds of such timeseries from 15 min resolution to secondly resolutions.
+You get provided a sample dataset of the "to be frequency of the grid" for 2 months in 30sec resolution. Design the solution so it is scalable to hundreds of such timeseries from 15 min resolution to secondly resolutions.
 The goal of the challenges is to ingest the sample data set effeciently into this database and put a asyncronious API framework of your choice on top to query the data to provide data for different applications.
 
 
@@ -16,20 +16,20 @@ discussion for your next interview.
 
 ### Starting Point
 
-* sample timeseries in this repository in CSV format.
-* Preferred & already in place programming language is python although you can use different languages if you can argument it
+* sample timeseries in this repository in CSV format
+* Preferred & already in place programming language is python although you can use different languages & technologies if you can argument it
 * Your solution has be packaged so we can run it(this is part of the challenge), so either use containers or language specific builds
 
 ### Abstract solution design
 
 ```mermaid
   flowchart TD
-    CSV -- Ingest Logic ---id1[(TS Database)] <--> id2[async API] <--> id3[application]
+    (CSV or other fileformat) -- Ingest Logic ---tsdb[(TS Database)] <--> api[async API] <--> app[application]
 ```
 
 ### Step 1
 
-* Make technology choices for the database and the API framework and document why you chose them(Hint: we love [adrs](https://adr.github.io/)).
+* Make technology choices for the database and the API framework and document why you chose them(Hint: we like [adrs](https://adr.github.io/)).
 
 ### Step 2
 
