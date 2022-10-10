@@ -24,7 +24,7 @@ discussion for your next interview.
 
 ```mermaid
   flowchart TD
-    input[(CSV or other fileformat)] -- Ingest Logic ---tsdb[(TS Database)] <--> api[async API] <--> app[application]
+    input[CSV or other fileformat] -- Ingest Logic ---tsdb[(TS Database)] <--> api[async API] <--> app[application]
 ```
 
 ### Step 1
