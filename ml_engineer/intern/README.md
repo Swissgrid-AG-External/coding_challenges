@@ -11,8 +11,8 @@ The goal of the challenge is to look over the results of the participants and pr
 
 1. Write a markdown document how you would approach this.
 Focus on structural aspects of the code e.g. software engineering practices(code documentation, structure, ML frameworks etc.).
-2. Refactor the provided scripts into a normal .py file (or files) focussing on your results from the first bullet point. Please only provide the py files, API wrapper and containerization is not needed at this stage.
-3. Pick out 1 to 2 functions in the scripts that you would change or that you think are missing and deliver them to us in Python.
+2. Refactor the provided scripts into a normal .py file (or files) focussing on your results from the first bullet point. Please only provide the py files, API wrapper and containerization is not needed at this stage.Don't focus on rewriting functionalities at this point but on structure instead.
+3. Pick out 1 to 2 functions in the scripts that you would change or that you think are missing and deliver them to us.
 
 **Please invest no more than 2 hours for each part or 6 hours in total.**
 
@@ -29,4 +29,4 @@ What we're looking for:
 * The ability to determine the actual problem area and find a suitable solution
 * Scratch features when necessary, time is short!
 * Document your approach, your decisions, and your general notes
-
+* Give us some feedback on the challenge :)
