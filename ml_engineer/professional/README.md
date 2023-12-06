@@ -4,17 +4,17 @@
 ## Intro
 
 Swissgrid took part in an Machine Learning Hackathon.
-The results were very impressive and multiple internal stakeholders want to see how the models perform in production.
+The results were very impressive and multiple internal stakeholders want to see how the model perform in production.
 You get provided the folder structure and the python notebooks that the participants provided.
 
 The goal of the challenge is to look over the results of the participants and provide the following:
 
 1. Your checklist to bring the model into production. Look over it, understand it, show potential problems with the model and so on an forth.
-Think about architecture in production 
-2. Wrap the model and everything you thought about in point one into an asynchronous API framework of your choice. We prefer Python but if you can argue other languages/frameworks please do so!
+Think about architecture in production and choose your components wisely.
+2. Wrap the model and everything you thought about in point one into an asynchronous API framework of your choice. We prefer this in Python but if you can argue other languages/frameworks please do so!
+Implement typical endpoints that are needed in production.
 3. Containerize the components and run them on your local machine.
 4. Split some data from the data provided in the hackathon and simulate inference of the model.
-
 
 You will present the deliverables at the start of the second interview.
 Avoid Powerpoint at all costs!
