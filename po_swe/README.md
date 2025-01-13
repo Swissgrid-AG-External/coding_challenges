@@ -22,7 +22,7 @@ Evaluation criteria:
 - Addressing problems
 - Clear communication
 
-
+Technical stuff is not so important although if you can bring great technical solutions please let us know! 
 ## Deliverables
 
 Please think about this problem and communicate in a 10 min pitch to the management how you would tackle it.
