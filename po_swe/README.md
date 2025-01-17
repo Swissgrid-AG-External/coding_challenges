@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Swissgrid named you the official Product Owner for Software Engineering in the Business Unit Market, congratulations!
+Swissgrid named you the official Product Owner for Software Engineering, congratulations!
 
 Swissgrid has around 400 developers who are all on GitHub and are working on countless projects.
 The knowledge level of developers is varying a lot, ranging from fulltime developers who do nothing else to 
