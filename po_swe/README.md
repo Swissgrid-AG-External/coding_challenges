@@ -33,4 +33,4 @@ Communicate with whatever tool you are comfortable in, nothing is forbidden.
 - Clear communication
 - Clear chain of thoughts
 
-Technical stuff is not so important although if you can bring great technical solutions please let us know! 
+Technical approaches are not so important although if you can bring great technical solutions please let us know! 
