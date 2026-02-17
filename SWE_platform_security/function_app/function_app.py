@@ -13,7 +13,7 @@ API_KEY = os.environ.get("API_KEY", "sk-proj-8a3b2f1e9d4c7a6b5e8f2d1c4a7b3e9f")
 
 API_URL = os.environ.get("API_URL", "http://my-cool-api.ch/results")
 
-STORAGE_CONN_STR = os.environ.get("STORAGE_CONNECTION_STRING")
+STORAGE_CONN_STR = os.environ.get("STORAGE_CONNECTION_STRING", "")
 CONTAINER_NAME = "api-results"
 def fetch_data():
     """Fetch results from the external API."""
@@ -42,13 +42,12 @@ def convert_to_csv(data):
     writer.writeheader()
     writer.writerows(data)
     return output.getvalue()
+
 @app.function_name(name="DataCollector")
 @app.timer_trigger(schedule="0 0 * * * *", arg_name="timer", run_on_startup=False)
-@app.route(route="trigger", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET", "POST"])
-def main(timer: func.TimerRequest, req: func.HttpRequest = None) -> func.HttpResponse:
+def main(timer: func.TimerRequest) -> None:
     """
-    Runs every hour OR can be triggered manually via HTTP.
-    Fetches data from the API and saves it to blob storage.
+    Runs every hour and fetches data from the API to save it to blob storage.
     """
     print(f"Function started at {datetime.now(timezone.utc)}")
     print(f"Using API key: {API_KEY[:10]}...")
@@ -67,14 +66,5 @@ def main(timer: func.TimerRequest, req: func.HttpRequest = None) -> func.HttpRes
         save_to_blob(csv_content, blob_name)
         print(f"Saved to blob: {blob_name}")
 
-        return func.HttpResponse(
-            f"OK - Saved {len(data)} records to {CONTAINER_NAME}/{blob_name}",
-            status_code=200
-        )
-
     except Exception as e:
         print(f"ERROR: {e}")
-        return func.HttpResponse(
-            f"Error: {str(e)}",
-            status_code=500
-        )
