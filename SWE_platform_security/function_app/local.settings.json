@@ -1,10 +1,10 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=http;AccountName=acmedatacollector01;AccountKey=base64encodedkeyhere==;EndpointSuffix=core.windows.net",
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "API_KEY": "sk-proj-8a3b2f1e9d4c7a6b5e8f2d1c4a7b3e9f",
-    "API_URL": "http://my-cool-api.ch/results",
-    "STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=http;AccountName=acmedatacollector01;AccountKey=base64encodedkeyhere==;EndpointSuffix=core.windows.net"
+    "API_KEY": "weigjoawig023ut92ughövawjeoijqhghaw",
+    "API_URL": "http://localhost:8081/results",
+    "STORAGE_CONNECTION_STRING": "UseDevelopmentStorage=true",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true"
   }
 }

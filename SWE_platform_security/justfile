@@ -9,6 +9,9 @@ help:
 install:
   cd {{function_dir}} && python3 -m pip install -r requirements.txt
 
+install-func-tools:
+  bash -c 'set -euo pipefail; if command -v func >/dev/null; then echo "Azure Functions Core Tools already installed: $(func --version)"; exit 0; fi; YARN_LIST="/etc/apt/sources.list.d/yarn.list"; YARN_LIST_DISABLED="/etc/apt/sources.list.d/yarn.list.disabled-by-just"; if [ -f "$YARN_LIST" ]; then sudo mv "$YARN_LIST" "$YARN_LIST_DISABLED"; fi; trap "if [ -f \"$YARN_LIST_DISABLED\" ]; then sudo mv \"$YARN_LIST_DISABLED\" \"$YARN_LIST\"; fi" EXIT; sudo apt-get update; sudo apt-get install -y gpg apt-transport-https; curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /usr/share/keyrings/microsoft-prod.gpg >/dev/null; echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" | sudo tee /etc/apt/sources.list.d/microsoft-prod.list >/dev/null; sudo apt-get update; sudo apt-get install -y azure-functions-core-tools-4; func --version'
+
 local-up:
   docker compose -f {{compose_file}} up -d
 
@@ -19,7 +22,10 @@ init-storage: install local-up
   python3 -c "from azure.storage.blob import BlobServiceClient; connection_string='UseDevelopmentStorage=true'; container_name='api-results'; blob_service=BlobServiceClient.from_connection_string(connection_string); container_client=blob_service.get_container_client(container_name); (container_client.create_container() or print(f'Created container: {container_name}')) if not container_client.exists() else print(f'Container already exists: {container_name}')"
 
 run-once: init-storage
-  cd {{function_dir}} && API_KEY='local-dev-key' API_URL='http://localhost:8081/results' STORAGE_CONNECTION_STRING='UseDevelopmentStorage=true' AzureWebJobsStorage='UseDevelopmentStorage=true' python3 -c "import csv, io, os, requests; from datetime import datetime, timezone; from azure.storage.blob import BlobServiceClient; api_url=os.environ['API_URL']; api_key=os.environ['API_KEY']; conn_str=os.environ['STORAGE_CONNECTION_STRING']; container='api-results'; headers={'Authorization': f'Bearer {api_key}', 'User-Agent': 'local-dev-runner/1.0'}; data=requests.get(api_url, headers=headers, timeout=30).json(); output=io.StringIO(); writer=csv.DictWriter(output, fieldnames=data[0].keys()); writer.writeheader(); writer.writerows(data); csv_content=output.getvalue(); blob_name=f'results_{datetime.now(timezone.utc).strftime(\"%Y%m%d_%H%M%S\")}.csv'; blob_service=BlobServiceClient.from_connection_string(conn_str); container_client=blob_service.get_container_client(container); container_client.upload_blob(name=blob_name, data=csv_content, overwrite=True); print(f'Saved {len(data)} records to {container}/{blob_name}')"
+  cd {{function_dir}} && FUNCTIONS_WORKER_RUNTIME='python' API_KEY='local-dev-key' API_URL='http://localhost:8081/results' STORAGE_CONNECTION_STRING='UseDevelopmentStorage=true' AzureWebJobsStorage='UseDevelopmentStorage=true' python3 -c "import function_app as app; app.main(None)"
 
-run-func: local-up
-  cd {{function_dir}} && API_KEY='local-dev-key' API_URL='http://localhost:8081/results' STORAGE_CONNECTION_STRING='UseDevelopmentStorage=true' AzureWebJobsStorage='UseDevelopmentStorage=true' func start --port 7071
+run-once-host: install-func-tools init-storage
+  cd {{function_dir}} && bash -c 'set -euo pipefail; LOG_FILE="/tmp/func-local.log"; rm -f "$LOG_FILE"; port=7071; for candidate in $(seq 7071 7090); do if ! lsof -iTCP:"$candidate" -sTCP:LISTEN >/dev/null 2>&1; then port="$candidate"; break; fi; done; echo "Using Azure Functions host port: $port"; func start --port "$port" > "$LOG_FILE" 2>&1 & host_pid=$!; cleanup(){ kill "$host_pid" 2>/dev/null || true; for _ in $(seq 1 20); do if ! kill -0 "$host_pid" 2>/dev/null; then return; fi; sleep 0.25; done; kill -9 "$host_pid" 2>/dev/null || true; }; trap cleanup EXIT INT TERM; ready="false"; for _ in $(seq 1 60); do if curl -fsS "http://127.0.0.1:$port/admin/host/status" >/dev/null; then ready="true"; break; fi; sleep 1; done; if [ "$ready" != "true" ]; then echo "Functions host did not become ready on port $port. Last logs:"; tail -n 80 "$LOG_FILE"; exit 1; fi; curl -fsS -X POST "http://127.0.0.1:$port/admin/functions/DataCollector" -H "Content-Type: application/json" -d "{}" >/dev/null; sleep 2; tail -n 80 "$LOG_FILE"'
+
+run-func: install-func-tools local-up
+  cd {{function_dir}} && func start --port 7071

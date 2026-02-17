@@ -4,7 +4,7 @@
 
 You just joined **Acme Corp** as a Platform / Security Engineer. A colleague built the following project over a weekend to solve an urgent business need:
 
-> A Python-based **Azure Function** runs once per hour, queries an external API (`https://my-cool-api.ch/results`), and stores the results as a CSV file in Azure Blob Storage.
+> A Python-based **Azure Function** runs once per hour, queries an external API (`http://my-cool-api.ch/results`), and stores the results as a CSV file in Azure Blob Storage.
 
 The code works — data shows up in the storage account every hour — but it was shipped under time pressure with **no security review**.
 
@@ -17,25 +17,31 @@ Your manager has asked you to **review, harden, and professionalize** this proje
 ```
 .
 ├── terraform/
-│   ├── providers.tf        # Terraform provider configuration
-│   ├── variables.tf        # Input variables
-│   ├── main.tf             # Infrastructure definitions
-│   └── outputs.tf          # Output values
+│   ├── providers.tf         # Terraform provider configuration
+│   ├── variables.tf         # Input variables
+│   ├── main.tf              # Infrastructure definitions
+│   └── outputs.tf           # Output values
 ├── function_app/
-│   ├── function_app.py     # Azure Function code (Python v2 model)
-│   ├── host.json           # Function host configuration
-│   ├── requirements.txt    # Python dependencies
-│   └── local.settings.json # Local development settings
-├── deploy.sh               # Deployment script
-└── README.md               # This file
+│   ├── function_app.py      # Azure Function code (Python v2 model)
+│   ├── host.json            # Function host configuration
+│   ├── requirements.txt     # Python dependencies
+│   └── local.settings.json  # Local development settings
+├── .gitignore
+├── docker-compose.local.yml # Local Azurite + mock API setup
+├── justfile                 # Local helper commands
+├── setup_linux.sh           # Linux bootstrap script
+├── deploy.sh                # Deployment script
+└── README.md                # This file
 ```
 
 ---
 
-## How to Deploy (current state)
+## How to Deploy (With Azure account -> not provided)
+
+> This section is only for completeness. We do not expect you to actually deploy the code on Azure!
 
 1. Fill in the variables in `terraform/variables.tf`
-2. Run `terraform init && terraform apply` from the `terraform/` directory
+2. Run `terraform init` from the `terraform/` directory
 3. Run `./deploy.sh` to package and deploy the function code
 
 ## Local Deployment (no Azure account required)
@@ -71,6 +77,7 @@ just run-once
 2. Ensures blob container `api-results` exists
 3. Fetches mock API data
 4. Writes a CSV blob to local Azurite storage
+5. The Azure function's `main` function is used as a normal python function.
 
 ### Optional Commands
 
@@ -80,10 +87,16 @@ Run local services only:
 just local-up
 ```
 
-Run Azure Functions host locally (requires Azure Functions Core Tools):
+Run Azure Functions host locally:
 
 ```bash
 just run-func
+```
+
+To run the Azure Function just once with a local host:
+
+```bash
+just run-once-host
 ```
 
 Stop and clean local services:
@@ -104,16 +117,21 @@ newgrp docker
 
 Please spend **60–90 minutes** on this challenge. You do **not** need to produce a fully working deployment — we are more interested in your **thought process, priorities, and approach**.
 
-### 1. Security Review
+### 1. Write the Function Code
+
+The Azure function code has some intenional blank lines marked with a `TODO:`. Fill in the missign code to make the function work.
+> Hint: `just run-once` should output some logs. The last line of the logs is `Saved to blob: results_YYYMMDD_HHmmSS.csv`.
+
+### 2. Security Review
 Identify as many security issues as you can across the entire codebase (Terraform, Python, deployment process). For each issue:
 - Describe the **risk**
 - Suggest a **remediation**
 - Rate the **severity** (Critical / High / Medium / Low)
 
-### 2. Code Improvements
+### 3. Code Improvements
 Pick the **top 3–5 issues** you identified and actually fix them in code. Feel free to refactor, restructure, or rewrite as needed.
 
-### 3. CI/CD Pipeline (Stretch Goal)
+### 4. CI/CD Pipeline (Stretch Goal)
 Propose or implement a CI/CD pipeline (GitHub Actions, Azure DevOps, GitLab CI, or similar) that:
 - Automates deployment
 - Includes security checks (linting, scanning, etc.)
