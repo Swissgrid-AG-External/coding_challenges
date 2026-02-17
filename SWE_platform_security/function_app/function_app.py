@@ -4,6 +4,7 @@ import os
 import csv
 import io
 from datetime import datetime
+from datetime import timezone
 from azure.storage.blob import BlobServiceClient
 
 app = func.FunctionApp()
@@ -49,7 +50,7 @@ def main(timer: func.TimerRequest, req: func.HttpRequest = None) -> func.HttpRes
     Runs every hour OR can be triggered manually via HTTP.
     Fetches data from the API and saves it to blob storage.
     """
-    print(f"Function started at {datetime.utcnow()}")
+    print(f"Function started at {datetime.now(timezone.utc)}")
     print(f"Using API key: {API_KEY[:10]}...")
 
     try:
@@ -60,7 +61,7 @@ def main(timer: func.TimerRequest, req: func.HttpRequest = None) -> func.HttpRes
         # Convert to CSV
         csv_content = convert_to_csv(data)
 
-        blob_name = f"results_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"
+        blob_name = f"results_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.csv"
 
         # Save to blob storage
         save_to_blob(csv_content, blob_name)
