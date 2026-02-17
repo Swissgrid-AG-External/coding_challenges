@@ -120,7 +120,7 @@ Please spend **60–90 minutes** on this challenge. You do **not** need to produ
 ### 1. Write the Function Code
 
 The Azure function code has some intenional blank lines marked with a `TODO:`. Fill in the missign code to make the function work.
-> Hint: `just run-once` should output some logs. The last line of the logs is `Saved to blob: results_YYYMMDD_HHmmSS.csv`.
+> Hint: `just run-once` should output some logs. The last line of the logs is `Saved to blob: results_YYYYmmdd_HHMMSS.csv`.
 
 ### 2. Security Review
 Identify as many security issues as you can across the entire codebase (Terraform, Python, deployment process). For each issue:
