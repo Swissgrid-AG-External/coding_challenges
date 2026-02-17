@@ -1,0 +1,5 @@
+[
+  {"timestamp": "2026-02-17T10:00:00Z", "value": 42.1, "source": "mock"},
+  {"timestamp": "2026-02-17T11:00:00Z", "value": 43.7, "source": "mock"},
+  {"timestamp": "2026-02-17T12:00:00Z", "value": 41.9, "source": "mock"}
+]

@@ -38,6 +38,66 @@ Your manager has asked you to **review, harden, and professionalize** this proje
 2. Run `terraform init && terraform apply` from the `terraform/` directory
 3. Run `./deploy.sh` to package and deploy the function code
 
+## Local Deployment (no Azure account required)
+
+This challenge can be run end-to-end on Linux without creating an Azure account.
+
+### Quick Start (Linux)
+
+From this folder (`SWE_platform_security/`), run:
+
+```bash
+chmod +x setup_linux.sh && ./setup_linux.sh
+```
+
+This installs:
+- `just`
+- `uv`
+- Python 3 + pip
+- Docker + Docker Compose plugin
+- Python dependencies from `function_app/requirements.txt`
+
+Then run one local ingestion cycle:
+
+```bash
+just run-once
+```
+
+### What `just run-once` does
+
+1. Starts local services with Docker:
+   - Azurite (Azure Blob emulator)
+   - Mock API (`http://localhost:8081/results`)
+2. Ensures blob container `api-results` exists
+3. Fetches mock API data
+4. Writes a CSV blob to local Azurite storage
+
+### Optional Commands
+
+Run local services only:
+
+```bash
+just local-up
+```
+
+Run Azure Functions host locally (requires Azure Functions Core Tools):
+
+```bash
+just run-func
+```
+
+Stop and clean local services:
+
+```bash
+just local-down
+```
+
+If Docker permission is denied after setup, run:
+
+```bash
+newgrp docker
+```
+
 ---
 
 ## Your Tasks
