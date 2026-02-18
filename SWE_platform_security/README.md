@@ -115,7 +115,7 @@ newgrp docker
 
 ## Your Tasks
 
-Please spend **60–90 minutes** on this challenge. You do **not** need to produce a fully working deployment — we are more interested in your **thought process, priorities, and approach**.
+Please do not spend more than **8 hours** on this challenge. You do **not** need to produce a fully working deployment — we are more interested in your **thought process, priorities, and approach**.
 
 ### 1. Write the Function Code
 
