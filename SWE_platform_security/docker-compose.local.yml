@@ -1,0 +1,13 @@
+services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    command: azurite-blob --blobHost 0.0.0.0 --loose --skipApiVersionCheck
+    ports:
+      - "10000:10000"
+
+  mock-api:
+    image: nginx:alpine
+    ports:
+      - "8081:80"
+    volumes:
+      - ./mock_api:/usr/share/nginx/html:ro
