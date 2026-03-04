@@ -1,0 +1,224 @@
+name: CI/CD - Validate, Plan, Apply, Deploy
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "terraform/**"
+      - ".github/workflows/cicd.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "terraform/**"
+      - "function_app/**"
+      - ".github/workflows/cicd.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+jobs:
+  ci-validate:
+    name: CI Validate and Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Setup Ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: "0.6.8"
+
+      - name: Ruff Lint
+        run: ruff check --config pyproject.toml .
+
+      - name: Ruff Format Check
+        run: ruff format --config pyproject.toml --check .
+
+      - name: Terraform Format Check
+        working-directory: terraform
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false -backend=false
+
+      - name: Terraform Validate
+        working-directory: terraform
+        run: terraform validate
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: terraform
+          quiet: true
+
+      - name: Run Trivy Misconfig Scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: config
+          scan-ref: terraform
+          format: table
+          exit-code: "1"
+
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: ci-validate
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    # this is all an assumption
+    #  - name: Terraform Init (Remote State)
+    #    working-directory: terraform
+    #    run: |
+    #      terraform init -input=false \
+    #        -backend-config="resource_group_name=${{ vars.TFSTATE_RESOURCE_GROUP }}" \
+    #        -backend-config="storage_account_name=${{ vars.TFSTATE_STORAGE_ACCOUNT }}" \
+    #        -backend-config="container_name=${{ vars.TFSTATE_CONTAINER }}" \
+    #        -backend-config="key=${{ vars.TFSTATE_KEY }}" \
+    #        -backend-config="use_azuread_auth=true"
+#
+    #  - name: Terraform Plan
+    #    working-directory: terraform
+    #    run: terraform plan -input=false -out=tfplan
+#
+    #  - name: Publish Terraform Plan Summary
+    #    run: |
+    #      echo "## Terraform Plan" >> "$GITHUB_STEP_SUMMARY"
+    #      echo "" >> "$GITHUB_STEP_SUMMARY"
+    #      echo "Terraform plan completed." >> "$GITHUB_STEP_SUMMARY"
+    #      echo "Plan upload steps are currently commented out." >> "$GITHUB_STEP_SUMMARY"
+#
+      # - name: Upload tfplan to Azure Blob
+      #   run: |
+      #     az storage blob upload \
+      #       --auth-mode login \
+      #       --account-name "${{ vars.TFPLAN_STORAGE_ACCOUNT }}" \
+      #       --container-name "${{ vars.TFPLAN_CONTAINER }}" \
+      #       --name "tfplan-${{ github.run_id }}" \
+      #       --file terraform/tfplan \
+      #       --overwrite true
+
+  terraform-apply:
+    name: Terraform Apply 
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Approval gate is enforced by required reviewers on this environment
+    environment: production
+    outputs:
+      function_app_name: ${{ steps.tf-output.outputs.function_app_name }}
+      resource_group_name: ${{ steps.tf-output.outputs.resource_group_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Demo mode: disabled because this environment has no Azure setup.
+      # - name: Azure Login
+      #   uses: azure/login@v2
+      #   with:
+      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
+      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Demo - Simulate Terraform apply
+        run: echo "[DEMO] Downloads tfplan from Azure Blob using the same federated service principal and runs terraform apply."
+      # Real (non-demo) option:
+      # - name: Azure Login
+      #   uses: azure/login@v2
+      #   with:
+      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
+      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # - name: Download tfplan from Azure Blob
+      #   run: |
+      #     az storage blob download \
+      #       --auth-mode login \
+      #       --account-name "$TFPLAN_STORAGE_ACCOUNT" \
+      #       --container-name "$TFPLAN_CONTAINER" \
+      #       --name "tfplan-${{ github.run_id }}" \
+      #       --file terraform/tfplan
+
+      - name: Demo - Set simulated Terraform outputs
+        id: tf-output
+        run: |
+          echo "function_app_name=func-data-collector-prod-demo" >> "$GITHUB_OUTPUT"
+          echo "resource_group_name=rg-data-collector-demo" >> "$GITHUB_OUTPUT"
+
+  deploy-function:
+    name: Deploy Azure Function (Approval Required, Demo)
+    runs-on: ubuntu-latest
+    needs: terraform-apply
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Approval gate is enforced by required reviewers on this environment.
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Demo mode: disabled because this environment has no Azure OIDC setup.
+      # - name: Azure Login
+      #   uses: azure/login@v2
+      #   with:
+      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
+      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install function dependencies into package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r function_app/requirements.txt \
+            --target function_app/.python_packages/lib/site-packages
+
+      - name: Demo - Simulate function deployment
+        run: echo "[DEMO] Deploys function package and sets production app settings."

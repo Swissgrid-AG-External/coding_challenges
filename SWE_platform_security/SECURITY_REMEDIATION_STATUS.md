@@ -31,6 +31,8 @@ This document summarizes what has been fixed in this branch, prioritized per the
    - Related findings: `TF-003`, `TF-005`, partially `TF-010`
 3. Added managed identity path for blob access and Terraform role assignment for blob write.
    - Related findings: `PY-009`
+4. Added CI/CD workflow (`.github/workflows/cicd.yml`) with automated linting, formatting, Terraform validate, Checkov, and Trivy checks on PRs.
+   - Related findings: `DEP-001` (partially)
 
 ### P2 Completed
 
@@ -46,25 +48,18 @@ This document summarizes what has been fixed in this branch, prioritized per the
    - Shared access key disabled
    - Blob/container soft-delete retention enabled
    - Related findings: `TF-009`, `TF-011`, `TF-014`, `TF-013`
+5. Removed legacy `deploy.sh` script to avoid uncontrolled `terraform apply -auto-approve` usage.
+   - Related findings: `DEP-001` (partially)
 
 ## Open / Deferred
 
 ### Still Open 
 
 - `PY-002`, `TF-M2`: Upstream API is still `http://` (external dependency and challenge constraint).
-- `DEP-001`: `deploy.sh` still contains `terraform apply -auto-approve`.
 - `PY-008`: Explicit API response size limiting is not yet implemented.
 - `TF-007`, `TF-004`, `TF-006`, `TF-012`, `TF-016`, `TF-017`, `TF-018`, and remaining policy checks currently skipped or de-scoped.
 - Azure Storage monitoring/observability controls (storage account and container read/write logging, diagnostics, and related monitoring policies) are explicitly out of scope
 
-### Planned Next Branch (CI/CD Integration)
-
-- Implement CI/CD pipeline gates for:
-  - linting and formatting
-  - dependency/security scanning
-  - IaC/security policy checks
-  - controlled deployment approvals
-- Replace or retire `deploy.sh` as part of pipeline-driven deployment flow.
 
 ## Finding Status Snapshot
 
@@ -99,4 +94,4 @@ This document summarizes what has been fixed in this branch, prioritized per the
 | TF-016 | Deferred |
 | TF-017 | Deferred |
 | TF-018 | Deferred |
-| DEP-001 | Open |
+| DEP-001 | Partially fixed (legacy script removed; CI/CD introduced; apply remains demo) |
