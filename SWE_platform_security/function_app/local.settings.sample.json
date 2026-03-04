@@ -2,7 +2,7 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "API_KEY": "weigjoawig023ut92ughövawjeoijqhghaw",
+    "API_KEY": "REPLACE_WITH_LOCAL_DEV_KEY",
     "API_URL": "http://localhost:8081/results",
     "CONTAINER_NAME": "api-results",
     "REQUEST_TIMEOUT_SECONDS": "15",

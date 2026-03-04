@@ -3,11 +3,13 @@
   "logging": {
     "applicationInsights": {
       "samplingSettings": {
-        "isEnabled": true
+        "isEnabled": true,
+        "excludedTypes": "Request"
       }
     },
     "logLevel": {
-      "default": "Debug"
+      "default": "Information",
+      "Function.DataCollector": "Information"
     }
   },
   "extensionBundle": {

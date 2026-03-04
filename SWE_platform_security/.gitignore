@@ -1,6 +1,10 @@
 __pycache__/
 *.pyc
 
+# local-only Azure Functions settings (never commit secrets)
+function_app/local.settings.json
+local.settings.json
+
 # Terraform artifacts
 .terraform/
 .terraform.lock.hcl

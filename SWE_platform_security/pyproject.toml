@@ -12,10 +12,6 @@ select = [
     "B",    # flake8-bugbear
     "S",    # flake8-bandit (security)
 ]
-ignore = [
-    "B008",  # do not perform function calls in argument defaults
-]
-
 [tool.ruff.lint.isort]
 known-first-party = ["function_app"]
 
