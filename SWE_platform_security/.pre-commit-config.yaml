@@ -1,3 +1,5 @@
+# issues with commits - run them before commits
+repos: []
 #repos:
 #  - repo: local
 #    hooks:

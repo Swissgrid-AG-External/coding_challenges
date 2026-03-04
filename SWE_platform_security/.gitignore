@@ -1,2 +1,26 @@
 __pycache__/
 *.pyc
+
+# local-only Azure Functions settings (never commit secrets)
+function_app/local.settings.json
+local.settings.json
+
+# Terraform artifacts
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.tfvars
+.tfvars.json
+plan.tfplan
+
+# Local pre-commit runner artifacts
+run_precommit.sh
+.pre-commit-cache/
+.tools/
