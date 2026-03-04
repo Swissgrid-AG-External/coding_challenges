@@ -1,0 +1,10 @@
+# Keep assessment focus on SWE_platform_security only
+cloud_engineer/
+data_engineer/
+github_conf/
+ml_engineer/
+platform_engineer/
+po_swe/
+
+# Local cache
+.ruff_cache/

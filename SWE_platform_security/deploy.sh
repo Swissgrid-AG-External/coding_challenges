@@ -30,7 +30,7 @@ cd function_app
 
 pip install -r requirements.txt
 
-zip -r ../functionapp.zip . 
+zip -r ../functionapp.zip .
 
 cd ..
 

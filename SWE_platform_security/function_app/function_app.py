@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
 import os
+from datetime import datetime, timezone
 
 import azure.functions as func
 
@@ -11,26 +11,34 @@ API_URL = os.environ.get("API_URL", "http://my-cool-api.ch/results")
 
 STORAGE_CONN_STR = os.environ.get("STORAGE_CONNECTION_STRING", "")
 CONTAINER_NAME = "api-results"
+
+
 def fetch_data():
     """Fetch results from the external API."""
-    headers = {
+    _headers = {
         "Authorization": f"Bearer {API_KEY}",
-        "User-Agent": "AcmeCorp-DataCollector/1.0 (internal-prod; contact: admin@acme-internal.corp)"
+        "User-Agent": (
+            "AcmeCorp-DataCollector/1.0 "
+            "(internal-prod; contact: admin@acme-internal.corp)"
+        ),
     }
 
     # TODO: Return some data.
-    
-    return data
+    return []
+
+
 def save_to_blob(csv_content, blob_name):
     """Save CSV content to Azure Blob Storage."""
-    
+
     # TODO: Save the CSV content to blob storage.
+
 
 def convert_to_csv(data):
     """Convert JSON data to CSV format."""
-    
+
     # TODO: Convert the data to CSV format and return as string.
     # Hint: Look at the mock API response in the mock_api directory.
+
 
 @app.function_name(name="DataCollector")
 @app.timer_trigger(schedule="0 0 * * * *", arg_name="timer", run_on_startup=False)
@@ -42,9 +50,12 @@ def main(timer: func.TimerRequest) -> None:
     print(f"Using API key: {API_KEY[:10]}...")
 
     try:
-        blob_name = f"results_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.csv"
+        blob_name = (
+            f"results_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.csv"
+        )
 
-        # TODO: Implement the main logic to fetch data, convert to CSV and save to blob storage.
+        # TODO: Implement the main logic to fetch data, convert to CSV and
+        # save to blob storage.
 
         print(f"Saved to blob: {blob_name}")
 
