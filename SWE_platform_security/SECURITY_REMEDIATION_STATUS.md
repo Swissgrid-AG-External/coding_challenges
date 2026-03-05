@@ -50,10 +50,15 @@ This document summarizes what has been fixed in this branch, prioritized per the
    - Related findings: `TF-009`, `TF-011`, `TF-014`, `TF-013`
 5. Removed legacy `deploy.sh` script to avoid uncontrolled `terraform apply -auto-approve` usage.
    - Related findings: `DEP-001` (partially)
+6. Refactored function data processing to a DataFrame-first pipeline:
+   - `fetch_data()` now parses API JSON directly into a pandas DataFrame using `pd.json_normalize(...)`
+   - Column names are sanitized (`.`, `-` -> `_`, lowercase), missing values are normalized (`fillna("")`), and columns are deterministically ordered
+   - CSV-injection protection remains enforced before export via `_safe_cell` in `convert_to_csv()`
+   - Related findings: supports hardening posture for `PY-006` and `PY-008` by keeping transformation logic centralized and explicit
 
 ## Open / Deferred
 
-### Still Open 
+### Still Open
 
 - `PY-002`, `TF-M2`: Upstream API is still `http://` (external dependency and challenge constraint).
 - `PY-008`: Explicit API response size limiting is not yet implemented.

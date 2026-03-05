@@ -1,13 +1,13 @@
-import csv
 import io
 import json
 import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 import azure.functions as func
+import pandas as pd
 import requests
 from azure.storage.blob import BlobServiceClient, ContentSettings
 
@@ -111,8 +111,8 @@ def _build_session() -> requests.Session:
 SESSION = _build_session()
 
 
-def fetch_data() -> List[Dict[str, Any]]:  # noqa: C901
-    """Fetch results from the external API and normalize to list[dict]."""
+def fetch_data() -> pd.DataFrame:  # noqa: C901
+    """Fetch API results and return a cleaned DataFrame."""
     user_agent = "AcmeCorp-DataCollector/1.0 (contact: admin@acme-internal.corp)"
 
     headers = {
@@ -140,24 +140,24 @@ def fetch_data() -> List[Dict[str, Any]]:  # noqa: C901
     except Exception as exc:
         raise RuntimeError("API response is not valid JSON") from exc
 
-    if isinstance(payload, list):
-        # Expect list of row objects.
-        if not all(isinstance(item, dict) for item in payload):
-            raise RuntimeError("API JSON list must contain objects")
-        return payload
+    # Assumption: API always returns a top-level JSON array of objects
+    # (same shape as SWE_platform_security/mock_api/results).
+    if not isinstance(payload, list) or not all(
+        isinstance(item, dict) for item in payload
+    ):
+        raise RuntimeError("API JSON must be a top-level list of objects")
 
-    if isinstance(payload, dict):
-        # Accept common nested list keys.
-        for key in ("results", "items", "data"):
-            value = payload.get(key)
-            if isinstance(value, list) and all(
-                isinstance(item, dict) for item in value
-            ):
-                return value
-        # Single object -> single row.
-        return [payload]
-
-    raise RuntimeError("Unsupported API JSON shape")
+    # Flatten nested JSON and apply stable, predictable column names/order.
+    df = pd.json_normalize(payload, sep="_")
+    df.columns = (
+        df.columns.astype(str)
+        .str.replace(".", "_", regex=False)
+        .str.replace("-", "_", regex=False)
+        .str.lower()
+    )
+    df = df.fillna("")
+    df = df.sort_index(axis=1)
+    return df
 
 
 def _safe_cell(value: Any) -> str:
@@ -180,24 +180,11 @@ def _safe_cell(value: Any) -> str:
     return cell
 
 
-def convert_to_csv(data: List[Dict[str, Any]]) -> str:
-    """Convert API rows into CSV with deterministic column ordering."""
-    fieldnames: List[str] = []
-    seen = set()
-    for row in data:
-        for key in row.keys():
-            if key not in seen:
-                seen.add(key)
-                fieldnames.append(key)
-
+def convert_to_csv(data: pd.DataFrame) -> str:
+    """Convert a DataFrame into CSV with spreadsheet-formula safeguards."""
+    safe_df = data.apply(lambda col: col.map(_safe_cell))
     buffer = io.StringIO(newline="")
-    writer = csv.DictWriter(buffer, fieldnames=fieldnames, extrasaction="ignore")
-    writer.writeheader()
-
-    for row in data:
-        safe_row = {key: _safe_cell(row.get(key)) for key in fieldnames}
-        writer.writerow(safe_row)
-
+    safe_df.to_csv(buffer, index=False, lineterminator="\r\n")
     return buffer.getvalue()
 
 

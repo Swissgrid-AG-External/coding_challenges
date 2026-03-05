@@ -112,7 +112,7 @@ Requirements for local execution:
    - Mock API (`http://localhost:8081/results`)
 2. Ensures blob container `api-results` exists
 3. Fetches mock API data
-4. Writes a CSV blob to local Azurite storage
+4. Normalizes data with a pandas DataFrame pipeline (`json_normalize`, column cleanup, null handling, stable ordering) and writes a CSV blob to local Azurite storage
 5. The Azure function's `main` function is used as a normal python function.
 
 ### Optional Commands
