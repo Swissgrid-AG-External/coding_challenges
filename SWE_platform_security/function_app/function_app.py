@@ -1,5 +1,4 @@
 import io
-import json
 import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -53,7 +52,7 @@ def _load_config() -> Config:  # noqa: C901
 
     parsed = urlparse(api_url)
     if parsed.scheme.lower() != "http":
-        raise ValueError("API_URL must use http://")
+        raise ValueError("API_URL must use http:// for this challenge environment")
     if not parsed.netloc:
         raise ValueError("API_URL must be a valid absolute URL")
     if parsed.username or parsed.password:
@@ -164,14 +163,11 @@ def _safe_cell(value: Any) -> str:
     """
     Normalize any value to a CSV-safe string.
     - None becomes an empty string.
-    - dict/list values are JSON-serialized into one cell.
     - If the final text starts with =, +, -, or @, prefix with '
       so spreadsheet apps treat it as text (not a formula).
     """
     if value is None:
         cell = ""
-    elif isinstance(value, (dict, list)):
-        cell = json.dumps(value, separators=(",", ":"), ensure_ascii=False)
     else:
         cell = str(value)
 
@@ -243,6 +239,7 @@ def main(timer: func.TimerRequest) -> None:
 
         rows = fetch_data()
         csv_content = convert_to_csv(rows)
+
         save_to_blob(csv_content, blob_name)
 
         print(f"Saved to blob: {blob_name} ({len(rows)} row(s))")

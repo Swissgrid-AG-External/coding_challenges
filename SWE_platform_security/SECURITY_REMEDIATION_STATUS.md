@@ -28,7 +28,8 @@ This document summarizes what has been fixed in this branch, prioritized per the
    - Blob container access set to private
    - Nested public access disabled
    - HTTPS-only storage traffic
-   - Related findings: `TF-003`, `TF-005`, partially `TF-010`
+   - Minimum TLS set to `TLS1_2`
+   - Related findings: `TF-003`, `TF-005`, `TF-011`, partially `TF-010`
 3. Added managed identity path for blob access and Terraform role assignment for blob write.
    - Related findings: `PY-009`
 4. Added CI/CD workflow (`.github/workflows/cicd.yml`) with automated linting, formatting, Terraform validate, Checkov, and Trivy checks on PRs.
@@ -44,10 +45,9 @@ This document summarizes what has been fixed in this branch, prioritized per the
    - Related findings: `PY-006`
 4. Enabled additional storage hardening controls:
    - Infrastructure encryption enabled
-   - Minimum TLS set to `TLS1_2`
    - Shared access key disabled
    - Blob/container soft-delete retention enabled
-   - Related findings: `TF-009`, `TF-011`, `TF-014`, `TF-013`
+   - Related findings: `TF-009`, `TF-014`, `TF-013`
 5. Removed legacy `deploy.sh` script to avoid uncontrolled `terraform apply -auto-approve` usage.
    - Related findings: `DEP-001` (partially)
 6. Refactored function data processing to a DataFrame-first pipeline:
