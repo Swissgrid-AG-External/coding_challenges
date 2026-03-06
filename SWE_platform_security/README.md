@@ -69,6 +69,42 @@ Then run one local ingestion cycle:
 just run-once
 ```
 
+### Local Configuration (Required Before Running)
+
+Create local settings from the sample:
+
+```bash
+cp function_app/local.settings.sample.json function_app/local.settings.json
+```
+
+Then edit `function_app/local.settings.json` and set at least:
+- `API_KEY`: your local/dev API token
+- `API_URL`: API endpoint (for local mock API use `http://localhost:8081/results`)
+- `STORAGE_CONNECTION_STRING`: for local Azurite keep `UseDevelopmentStorage=true`
+- `AzureWebJobsStorage`: for local Azurite keep `UseDevelopmentStorage=true`
+
+Optional:
+- `CONTAINER_NAME` (default: `api-results`)
+- `REQUEST_TIMEOUT_SECONDS` (default: `15`)
+
+`local.settings.json` is local-only and should not be committed.
+
+### Pre-commit Checks (Assumption)
+
+Assumption: `SWE_platform_security/` is the repository root and pre-commit hooks in `.pre-commit-config.yaml` are enabled (not commented out).
+
+Run:
+
+```bash
+pre-commit install
+pre-commit run --all-files
+```
+
+Requirements for local execution:
+- Python available in `PATH`
+- Terraform available in `PATH` (for `terraform_validate` and `terraform_fmt` hooks)
+- Network access on first run so pre-commit can download hook repositories
+
 ### What `just run-once` does
 
 1. Starts local services with Docker:
@@ -76,7 +112,7 @@ just run-once
    - Mock API (`http://localhost:8081/results`)
 2. Ensures blob container `api-results` exists
 3. Fetches mock API data
-4. Writes a CSV blob to local Azurite storage
+4. Normalizes data with a pandas DataFrame pipeline (`json_normalize`, column cleanup, null handling, stable ordering) and writes a CSV blob to local Azurite storage
 5. The Azure function's `main` function is used as a normal python function.
 
 ### Optional Commands

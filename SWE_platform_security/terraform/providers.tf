@@ -1,14 +1,22 @@
-
+# assuming ther is a storage account in place
 terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "sttfstateprod"
+    container_name       = "tfstate"
+    key                  = "prod/terraform.tfstate"
+    use_azuread_auth     = true
+  }
+
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
     }
   }
 }
 
 provider "azurerm" {
   features {}
-
-  subscription_id = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  use_oidc = true
 }

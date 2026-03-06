@@ -20,7 +20,6 @@ $SUDO apt-get install -y \
   ca-certificates \
   git \
   docker.io \
-  docker-compose-plugin \
   just
 
 echo "==> Enabling docker service"
