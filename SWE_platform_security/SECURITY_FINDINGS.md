@@ -24,6 +24,7 @@
 | TF-003 | Terraform | Storage container public access | Open |
 | TF-005 | Terraform | Storage secure transfer / HTTPS not enforced | Open |
 | TF-006 | Terraform | Storage network rules default action not deny (`AZU-0012`) | Open |
+| TF-011 | Terraform | Storage TLS minimum version | Open |
 | DEP-001 | Deploy Script | `terraform apply -auto-approve` bypasses change control | Open |
 
 ## Medium Findings
@@ -34,7 +35,6 @@
 | PY-007 | Function | Secret logging risk | Open |
 | TF-007 | Terraform | Storage logging not enabled (`AZU-0057`, `CKV_AZURE_33`) | Open|
 | TF-009 | Terraform | Storage infrastructure encryption not enabled | Open |
-| TF-011 | Terraform | Storage TLS minimum version | Open |
 | TF-015 | Terraform | SAS expiration policy | Open |
 
 ## Low Findings
